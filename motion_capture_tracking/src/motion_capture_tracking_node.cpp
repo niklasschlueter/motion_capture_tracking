@@ -6,7 +6,6 @@
 // Motion Capture
 #include <libmotioncapture/motioncapture.h>
 
-
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
@@ -31,8 +30,8 @@ int main(int argc, char **argv)
   tf2_ros::TransformBroadcaster tfbroadcaster(node);
   std::vector<geometry_msgs::msg::TransformStamped> transforms;
 
-
-  for (size_t frameId = 0; rclcpp::ok(); ++frameId) {
+  for (size_t frameId = 0; rclcpp::ok(); ++frameId)
+  {
 
     // Get a frame
     mocap->waitForNextFrame();
@@ -42,7 +41,7 @@ int main(int argc, char **argv)
     transforms.reserve(mocap->rigidBodies().size());
     for (const auto &iter : mocap->rigidBodies())
     {
-      const auto& rigidBody = iter.second;
+      const auto &rigidBody = iter.second;
 
       transforms.resize(transforms.size() + 1);
       transforms.back().header.stamp = time;
@@ -57,11 +56,13 @@ int main(int argc, char **argv)
       transforms.back().transform.rotation.w = rigidBody.rotation().w();
     }
 
-
-    if (transforms.size() > 0) {
+    if (transforms.size() > 0)
+    {
       // send TF. Since RViz and others can't handle nan's, report a fake oriention if needed
-      for (auto& tf : transforms) {
-        if (std::isnan(tf.transform.rotation.x)) {
+      for (auto &tf : transforms)
+      {
+        if (std::isnan(tf.transform.rotation.x))
+        {
           tf.transform.rotation.x = 0;
           tf.transform.rotation.y = 0;
           tf.transform.rotation.z = 0;
@@ -74,4 +75,4 @@ int main(int argc, char **argv)
     rclcpp::spin_some(node);
   }
   return 0;
-  }
+}

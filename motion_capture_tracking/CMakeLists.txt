@@ -14,6 +14,19 @@ find_package(tf2_ros REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
+find_package(fmt REQUIRED)
+
+# add dependencies
+#add_subdirectory(deps/librigidbodytracker EXCLUDE_FROM_ALL)
+set(LIBMOTIONCAPTURE_BUILD_PYTHON_BINDINGS OFF)
+set(LIBMOTIONCAPTURE_BUILD_EXAMPLE OFF)
+
+set(LIBMOTIONCAPTURE_ENABLE_QUALISYS OFF)
+set(LIBMOTIONCAPTURE_ENABLE_OPTITRACK OFF)
+set(LIBMOTIONCAPTURE_ENABLE_OPTITRACK_CLOSED_SOURCE OFF)
+set(LIBMOTIONCAPTURE_ENABLE_VICON ON)
+set(LIBMOTIONCAPTURE_ENABLE_VRPN ON)
+set(LIBMOTIONCAPTURE_ENABLE_FZMOTION OFF)
 
 # To use NOKOV, place their SDK in
 # motion_capture_tracking/deps/libmotioncapture/deps/nokov_sdk
@@ -38,10 +51,13 @@ add_executable(motion_capture_tracking_node
 )
 target_link_libraries(motion_capture_tracking_node
   libmotioncapture
+  fmt::fmt
 )
-ament_target_dependencies(motion_capture_tracking_node
-  rclcpp
-  tf2_ros
+target_link_libraries(motion_capture_tracking_node
+  rclcpp::rclcpp
+  tf2_ros::tf2_ros
+  ${sensor_msgs_TARGETS}
+  ${motion_capture_tracking_interfaces_TARGETS}
 )
 target_include_directories(motion_capture_tracking_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -53,7 +69,7 @@ install(TARGETS motion_capture_tracking_node
 
 # The precompiled libNatNet library is only available for x64 Linux
 if ((CMAKE_SYSTEM_NAME STREQUAL "Linux") AND (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
-  install(FILES 
+  install(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/libmotioncapture/deps/NatNetSDKCrossplatform/lib/ubuntu/libNatNet.so
     DESTINATION lib/${PROJECT_NAME}
   )
